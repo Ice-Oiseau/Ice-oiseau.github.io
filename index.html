@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Federico Pian — Creative Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN DNA: design_system → CSS Custom Properties
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* Color — neutral scale: light bg → dark text */
+  --color-bg:        #F0EFEA;
+  --color-surface:   #FFFFFF;
+  --color-primary:   #17191A;
+  --color-secondary: #505050;
+  --color-border:    rgba(23, 25, 26, 0.2);
+  --color-accent-1:  255, 150, 85;
+  --color-accent-2:  185, 60, 100;
+  --color-accent-bg: 223, 151, 173;
+
+  /* Typography */
+  --font-family:     'Safiro', 'Inter', 'Helvetica Neue', sans-serif;
+  --font-mono:       'SF Mono', 'Menlo', monospace;
+  --fs-display:      min(13.5vw, 22.4rem);
+  --fs-h1:           12.8rem;
+  --fs-h2:           3.2rem;
+  --fs-h3:           2.0rem;
+  --fs-body:         1.6rem;
+  --fs-body-sm:      1.2rem;
+  --fs-caption:      1.1rem;
+  --fs-overline:     1.4rem;
+  --lh-tight:        0.85;
+  --lh-normal:       1.1;
+  --lh-body:         1.2;
+  --tracking-tight:  -0.06em;
+  --tracking-normal: -0.05em;
+  --tracking-loose:  -0.02em;
+
+  /* Spacing */
+  --spacing-xs:  0.5rem;
+  --spacing-sm:  1rem;
+  --spacing-md:  2rem;
+  --spacing-lg:  4rem;
+  --spacing-xl:  8rem;
+
+  /* Shape */
+  --radius-sm: 7px;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-pill: 50%;
+
+  /* Motion */
+  --ease-out:  cubic-bezier(.215, .61, .355, 1);
+  --ease-smooth: cubic-bezier(.165, .84, .44, 1);
+  --dur-micro:  0.2s;
+  --dur-normal: 0.4s;
+  --dur-macro:  0.6s;
+  --dur-image:  1s;
+
+  /* Layout */
+  --grid-cols: 12;
+  --gutter:    2rem;
+  --max-width: none;
+
+  /* Initial opacity for entrance */
+  --opacity: 0;
+}
+
+html.dark {
+  --color-bg:        #1a1a1a;
+  --color-surface:   #242424;
+  --color-primary:   #F0EFEA;
+  --color-secondary: #a0a0a0;
+  --color-border:    rgba(240, 239, 234, 0.2);
+  --color-accent-1:  255, 180, 120;
+  --color-accent-2:  220, 100, 140;
+  --color-accent-bg: 80, 60, 70;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  font-size: 62.5%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: opacity var(--dur-macro) var(--ease-out);
+  opacity: var(--opacity);
+}
+body {
+  font-family: var(--font-family);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: var(--lh-body);
+  letter-spacing: var(--tracking-normal);
+  color: var(--color-primary);
+  background: var(--color-bg);
+  overflow-x: hidden;
+  min-height: 100vh;
+  transition: color var(--dur-normal) var(--ease-out),
+              background var(--dur-normal) var(--ease-out);
+}
+a { color: inherit; text-decoration: none; }
+button { background: none; border: none; cursor: pointer; font: inherit; color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* ═══════════════════════════════════════════════════════════════
+   CANVAS BACKGROUND — visual_effects.canvas_drawings
+   ═══════════════════════════════════════════════════════════════ */
+#flowCanvas {
+  position: fixed; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NOISE OVERLAY — dark mode texture (visual_effects.composite_notes)
+   ═══════════════════════════════════════════════════════════════ */
+.noise-overlay {
+  position: fixed; inset: 0; z-index: 1;
+  pointer-events: none; opacity: 0;
+  background-image: url('assets/background-noise.png');
+  background-size: 256px;
+  transition: opacity var(--dur-macro) var(--ease-out);
+}
+html.dark .noise-overlay { opacity: 0.035; }
+@keyframes noise-shift {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -3%); }
+  30% { transform: translate(3%, 7%); }
+  50% { transform: translate(-2%, -5%); }
+  70% { transform: translate(6%, 2%); }
+  90% { transform: translate(-4%, -1%); }
+}
+html.dark .noise-overlay { animation: noise-shift 0.35s steps(3) infinite; }
+
+/* ═══════════════════════════════════════════════════════════════
+   MOUSE TRAIL — visual_effects.cursor_effects
+   ═══════════════════════════════════════════════════════════════ */
+.mouse-trail {
+  position: fixed; pointer-events: none; z-index: 3;
+}
+.trail-img {
+  position: absolute; width: 25.6rem; aspect-ratio: 1.74;
+  border-radius: var(--radius-sm); overflow: hidden; opacity: 0;
+  transform: scale(0); will-change: transform, opacity, left, top;
+}
+.trail-img img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-sm);
+  will-change: transform;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HEADER — design_system.layout (12-col grid on desktop)
+   ═══════════════════════════════════════════════════════════════ */
+header {
+  position: relative; z-index: 10;
+  display: grid; grid-template-columns: repeat(var(--grid-cols), 1fr);
+  gap: var(--gutter); padding: var(--spacing-md);
+  font-size: var(--fs-body-sm);
+  line-height: 1; letter-spacing: var(--tracking-loose);
+  color: var(--color-primary);
+  transition: color var(--dur-normal) var(--ease-out);
+}
+.logo { grid-column: 1 / 3; display: flex; align-items: center; gap: var(--spacing-xs); }
+.logo svg { width: 1.8rem; height: auto; }
+nav { grid-column: 3 / 8; display: flex; align-items: center; gap: var(--spacing-md); }
+.nav-item {
+  transition: opacity var(--dur-micro) var(--ease-out);
+}
+nav .nav-item:first-child { opacity: 0.35; }
+@media (hover:hover) { .nav-item:hover { opacity: 0.5; } }
+
+.theme-toggle {
+  grid-column: 12 / 13; justify-self: end;
+  display: flex; align-items: center; gap: 0.5rem;
+  transition: opacity var(--dur-micro) var(--ease-out);
+}
+@media (hover:hover) { .theme-toggle:hover { opacity: 0.5; } }
+.theme-toggle svg { width: 1.4rem; height: auto; }
+.theme-label { display: none; }
+@media only screen and (min-width: 1024px) { .theme-label { display: inline; } }
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN SHOWCASE
+   ═══════════════════════════════════════════════════════════════ */
+.showcase {
+  position: relative; z-index: 2; overflow: hidden;
+  min-height: calc(100vh - 10rem);
+  display: flex; flex-direction: column;
+  padding: var(--spacing-md);
+}
+.project-title-area {
+  display: flex; flex-direction: column; align-items: center; gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+  text-align: center;
+}
+@media only screen and (min-width: 1024px) {
+  .project-title-area {
+    align-items: flex-start; text-align: left;
+    max-width: 50%;
+  }
+}
+.project-number {
+  font-size: var(--fs-caption); letter-spacing: var(--tracking-loose);
+  color: var(--color-secondary);
+  transition: color var(--dur-normal) var(--ease-out);
+}
+.project-title {
+  font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+  font-size: var(--fs-display);
+  font-weight: 400; font-style: italic;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+  text-transform: lowercase;
+  transition: color var(--dur-normal) var(--ease-out);
+}
+.project-title .word { display: block; }
+
+/* ═══════════════════════════════════════════════════════════════
+   TITLE HOVER — glitch chromatic aberration + 3D parallax
+   ═══════════════════════════════════════════════════════════════ */
+.project-title-area {
+  perspective: 800px;
+}
+.project-title {
+  transition: color var(--dur-normal) var(--ease-out),
+              text-shadow 0.15s cubic-bezier(.215, .61, .355, 1),
+              transform 0.15s ease-out;
+  will-change: transform, text-shadow;
+}
+/* Glitch — RGB split on hover */
+.project-title-area:hover .project-title {
+  text-shadow:
+    -2px -1px 0 rgba(255, 0, 60, 0.55),
+     3px  1px 0 rgba(0, 200, 255, 0.55),
+    -4px  2px 0 rgba(255, 255, 255, 0.08);
+}
+/* 3D parallax — driven by JS CSS variables */
+.project-title-area:hover .project-title {
+  transform:
+    perspective(800px)
+    rotateY(calc(var(--mx, 0) * 12deg))
+    rotateX(calc(var(--my, 0) * -10deg));
+}
+/* Dark mode — slightly different glitch colors */
+html.dark .project-title-area:hover .project-title {
+  text-shadow:
+    -3px -1px 0 rgba(255, 80, 120, 0.7),
+     4px  2px 0 rgba(80, 200, 255, 0.7),
+    -5px  3px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROGRESS INDICATOR — visual_effects.svg_animations
+   ═══════════════════════════════════════════════════════════════ */
+.progress-circle-wrap {
+  position: absolute; right: var(--spacing-md); bottom: var(--spacing-md);
+  z-index: 10; width: 8rem; height: 8rem;
+}
+@media only screen and (min-width: 1024px) {
+  .progress-circle-wrap { width: 12rem; height: 12rem; right: var(--spacing-lg); bottom: var(--spacing-lg); }
+}
+.progress-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.progress-bg {
+  fill: none; stroke: var(--color-border);
+  stroke-width: 1; transition: stroke var(--dur-normal) var(--ease-out);
+}
+.progress-fg {
+  fill: none; stroke: var(--color-primary);
+  stroke-width: 1; stroke-linecap: round;
+  transition: stroke-dashoffset var(--ease-smooth) var(--dur-macro),
+              stroke var(--dur-normal) var(--ease-out);
+}
+.progress-num {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  font-size: var(--fs-h2); line-height: 1; letter-spacing: var(--tracking-tight);
+  color: var(--color-primary);
+  transition: color var(--dur-normal) var(--ease-out);
+}
+.progress-num span { font-size: 50%; }
+
+/* ═══════════════════════════════════════════════════════════════
+   IMAGE PREVIEW — design_style.imagery (circular)
+   ═══════════════════════════════════════════════════════════════ */
+.image-preview {
+  position: absolute; right: var(--spacing-md); bottom: var(--spacing-md);
+  width: 14rem; height: 14rem; border-radius: var(--radius-pill);
+  overflow: hidden; z-index: 5; pointer-events: none;
+}
+@media only screen and (min-width: 1024px) {
+  .image-preview { right: var(--spacing-xl); bottom: var(--spacing-lg); width: 28rem; height: 28rem; }
+}
+.image-circle {
+  width: 100%; height: 100%; border-radius: var(--radius-pill);
+  background-size: cover; background-position: center;
+  transition: background-image 0.5s ease, background-color 0.5s ease, transform var(--dur-image) var(--ease-smooth);
+}
+html.dark .image-circle::after {
+  content: ''; position: absolute; inset: 0; border-radius: var(--radius-pill);
+  background: rgba(0,0,0,.2);
+}
+@media (hover:hover) { .image-preview:hover .image-circle { transform: scale(1.1); } }
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDE LABELS — design_system.layout (asymmetric anchors)
+   ═══════════════════════════════════════════════════════════════ */
+.side-label {
+  position: absolute; font-size: var(--fs-body-sm); letter-spacing: var(--tracking-normal);
+  line-height: 1; color: var(--color-secondary); z-index: 3;
+  transition: color var(--dur-normal) var(--ease-out);
+}
+.left-label  { left: var(--spacing-md); top: 10rem; }
+.right-label { right: var(--spacing-md); top: 10rem; }
+@media only screen and (min-width: 1024px) {
+  .left-label  { left: var(--spacing-xl); top: 50%; transform: translateY(-50%); padding-bottom: 19rem; }
+  .right-label { right: var(--spacing-xl); top: 50%; transform: translateY(-50%); padding-bottom: 19rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROJECT CARDS (bottom strip) — design_system.components
+   ═══════════════════════════════════════════════════════════════ */
+.project-track {
+  display: flex; gap: var(--gutter); margin-top: auto;
+  padding: var(--spacing-md) 0;
+}
+.project-card {
+  flex: 0 0 auto;
+  display: none; flex-direction: column;
+  font-size: var(--fs-body-sm); line-height: var(--lh-normal);
+  letter-spacing: var(--tracking-normal);
+  transition: opacity var(--dur-normal) var(--ease-out);
+}
+.project-card:nth-child(-n+3) { display: flex; }
+.project-link {
+  transition: opacity var(--dur-micro) var(--ease-out);
+}
+.project-card:not(.active) .project-link { opacity: 0.25; }
+.project-card.active .project-link { opacity: 1; }
+@media (hover:hover) { .project-link:hover { opacity: 1 !important; } }
+.project-home-title {
+  font-size: var(--fs-h3); text-transform: lowercase;
+  color: var(--color-primary); line-height: var(--lh-normal);
+  transition: color var(--dur-normal) var(--ease-out);
+}
+.project-meta {
+  display: flex; align-items: center; gap: 8px; margin-top: var(--spacing-xs);
+}
+.meta-label { color: var(--color-secondary); transition: color var(--dur-normal) var(--ease-out); }
+.secondary { color: var(--color-secondary); transition: color var(--dur-normal) var(--ease-out); }
+.meta-divider {
+  width: 3px; height: 3px; border-radius: 50%;
+  background: var(--color-secondary); display: inline-block;
+  transition: background var(--dur-normal) var(--ease-out);
+}
+.project-desc {
+  color: var(--color-secondary); font-size: var(--fs-body);
+  line-height: var(--lh-body); letter-spacing: var(--tracking-normal);
+  max-width: 30rem; margin-left: var(--spacing-lg); text-align: center;
+  transition: color var(--dur-normal) var(--ease-out);
+}
+@media only screen and (min-width: 1024px) {
+  .project-desc { font-size: 2rem; margin-left: var(--spacing-sm); text-align: left; }
+}
+.project-bottom {
+  display: flex; flex-direction: column; align-items: center; gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+@media only screen and (min-width: 1024px) {
+  .project-bottom { flex-direction: row; align-items: flex-start; justify-content: space-between; margin-top: var(--spacing-lg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CTA BUTTON — design_system.components.button_style
+   Expand-on-hover: icon container starts at right 25%, expands to 100%
+   ═══════════════════════════════════════════════════════════════ */
+.project-cta {
+  position: relative; display: inline-flex; align-items: center; overflow: hidden;
+  padding: .5rem 1rem; border: 1px solid var(--color-primary); border-radius: var(--radius-md);
+  color: var(--color-primary); font-size: 1.4rem; text-transform: uppercase;
+  transition: color var(--dur-normal) var(--ease-out), border-color var(--dur-normal) var(--ease-out);
+}
+@media only screen and (min-width: 1024px) {
+  .project-cta { padding: 1rem 1.5rem; border-radius: var(--radius-lg); font-size: var(--fs-body); }
+}
+.cta-label { margin-right: 3rem; transition: opacity 0.5s; }
+@media only screen and (min-width: 1024px) { .cta-label { margin-right: 4rem; } }
+.cta-icon-wrap {
+  position: absolute; right: 2px; top: 2px; bottom: 2px; z-index: 2;
+  display: grid; place-items: center;
+  border-radius: .7rem; width: 25%; min-width: 2.4rem;
+  background: var(--color-primary); color: var(--color-bg);
+  transition: width 0.5s, background var(--dur-normal) var(--ease-out);
+}
+.cta-icon-wrap svg { width: 56%; height: 56%; }
+@media only screen and (min-width: 1024px) { .cta-icon-wrap { border-radius: 1.25rem; } }
+@media (hover:hover) {
+  .project-cta:hover .cta-label { opacity: 0; }
+  .project-cta:hover .cta-icon-wrap { width: calc(100% - 4px); }
+  .project-cta:active .cta-icon-wrap { transform: scale(.95); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAV ARROWS — design_system.components.navigation_pattern
+   ═══════════════════════════════════════════════════════════════ */
+.nav-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 10;
+  cursor: pointer; overflow: hidden; width: 3rem;
+  color: var(--color-primary);
+  transition: color var(--dur-normal) var(--ease-out);
+}
+.nav-prev { left: var(--spacing-md); }
+.nav-next { right: var(--spacing-md); }
+@media only screen and (min-width: 1024px) {
+  .nav-prev { left: var(--spacing-lg); }
+  .nav-next { right: var(--spacing-lg); }
+}
+.nav-arrow svg { width: 100%; display: block; transition: transform var(--dur-normal) var(--ease-out); }
+.nav-arrow .arrow-dup { position: absolute; top: 0; left: 0; }
+.nav-prev .arrow-dup { transform: translate3d(-100%, 0, 0); }
+.nav-next .arrow-dup { transform: translate3d(100%, 0, 0); }
+@media (hover:hover) {
+  .nav-prev:hover svg:first-child { transform: translate3d(100%, 0, 0); }
+  .nav-prev:hover .arrow-dup { transform: translateZ(0); }
+  .nav-next:hover svg:first-child { transform: translate3d(-100%, 0, 0); }
+  .nav-next:hover .arrow-dup { transform: translateZ(0); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROJECT SWITCH TRANSITION
+   ═══════════════════════════════════════════════════════════════ */
+.showcase.switching .project-title-area,
+.showcase.switching .image-preview,
+.showcase.switching .side-label,
+.showcase.switching .progress-circle-wrap {
+  opacity: 0;
+  transform: translateY(-12px);
+  transition: opacity 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+}
+.showcase .project-title-area,
+.showcase .image-preview,
+.showcase .side-label,
+.showcase .progress-circle-wrap {
+  transition: opacity 0.35s var(--ease-out), transform 0.35s var(--ease-out);
+}
+.showcase.switching .project-track {
+  opacity: 0.4;
+  transition: opacity 0.25s var(--ease-out);
+}
+.showcase .project-track {
+  transition: opacity 0.35s var(--ease-out);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════ */
+@media only screen and (max-width: 1023px) {
+  .showcase { min-height: calc(100vh - 12rem); }
+  .project-title-area { margin-top: var(--spacing-md); }
+  .image-preview { right: var(--spacing-md); bottom: 12rem; }
+  .progress-circle-wrap { right: var(--spacing-md); bottom: 12rem; }
+  .project-card:nth-child(n+4) { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOADING OVERLAY — circular progress + exit transition
+   ═══════════════════════════════════════════════════════════════ */
+.loader-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--spacing-md);
+  background: var(--color-bg);
+  transition: opacity 0.55s var(--ease-smooth),
+              visibility 0.55s var(--ease-smooth);
+}
+.loader-overlay.exiting {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Ring */
+.loader-ring {
+  position: relative; width: 14rem; height: 14rem;
+}
+.loader-svg {
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+.loader-bg {
+  fill: none; stroke: var(--color-border);
+  stroke-width: 1;
+}
+.loader-fg {
+  fill: none; stroke: var(--color-primary);
+  stroke-width: 1; stroke-linecap: round;
+  transition: stroke-dashoffset 0.35s linear;
+}
+
+/* Number */
+.loader-num {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-family);
+  font-size: var(--fs-h2); font-weight: 400;
+  line-height: 1; letter-spacing: var(--tracking-tight);
+  color: var(--color-primary);
+}
+.loader-num span { font-size: 50%; }
+
+/* Label */
+.loader-label {
+  font-size: var(--fs-body-sm);
+  letter-spacing: var(--tracking-loose);
+  color: var(--color-secondary);
+  opacity: 0.6;
+  animation: loader-pulse 1.6s ease-in-out infinite;
+}
+@keyframes loader-pulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.70; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOADING OVERLAY ═══════════ -->
+<div class="loader-overlay" id="loaderOverlay">
+  <div class="loader-ring">
+    <svg class="loader-svg" viewBox="0 0 284 284">
+      <circle class="loader-bg" cx="142" cy="142" r="140"/>
+      <circle class="loader-fg" id="loaderFg" cx="142" cy="142" r="140"
+              stroke-dasharray="880" stroke-dashoffset="880"/>
+    </svg>
+    <div class="loader-num" id="loaderNum">0<span>%</span></div>
+  </div>
+  <span class="loader-label">Loading</span>
+</div>
+
+<!-- ═══════════ CANVAS BACKGROUND ═══════════ -->
+<canvas id="flowCanvas"></canvas>
+<div class="noise-overlay"></div>
+
+<!-- ═══════════ MOUSE TRAIL ═══════════ -->
+<div class="mouse-trail" id="mouseTrail" aria-hidden="true"></div>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header>
+  <a href="/" class="logo">
+    <svg width="18" height="23" viewBox="0 0 18 23" fill="none"><path d="M9 0L17.5 5.5V16.5L9 22L0.5 16.5V5.5L9 0Z" stroke="currentColor"/></svg>
+    <span>Federico Pian</span>
+  </a>
+  <nav>
+    <span class="nav-item">About</span>
+    <span class="nav-item">Projects</span>
+    <span class="nav-item">Studio</span>
+  </nav>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <span class="theme-label">Dark</span>
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor"/><path d="M8 1a7 7 0 0 0 0 14V1z" fill="currentColor"/></svg>
+  </button>
+</header>
+
+<!-- ═══════════ MAIN SHOWCASE ═══════════ -->
+<main class="showcase" id="showcase">
+  <button class="nav-arrow nav-prev" id="navPrev" aria-label="Previous project">
+    <svg width="30" height="17" viewBox="0 0 30 17" fill="none"><path d="M2 8.5h28M9 1.5l-7 7 7 7" stroke="currentColor"/></svg>
+    <svg width="30" height="17" viewBox="0 0 30 17" fill="none" class="arrow-dup"><path d="M2 8.5h28M9 1.5l-7 7 7 7" stroke="currentColor"/></svg>
+  </button>
+  <button class="nav-arrow nav-next" id="navNext" aria-label="Next project">
+    <svg width="30" height="17" viewBox="0 0 30 17" fill="none"><path d="M2 8.5h28M21 1.5l7 7-7 7" stroke="currentColor"/></svg>
+    <svg width="30" height="17" viewBox="0 0 30 17" fill="none" class="arrow-dup"><path d="M2 8.5h28M21 1.5l7 7-7 7" stroke="currentColor"/></svg>
+  </button>
+
+  <div class="project-title-area" id="projectTitleArea">
+    <span class="project-number" id="projectNumber">01</span>
+    <h1 class="project-title" id="projectTitle"><span class="word">airbag</span><span class="word">studio</span></h1>
+  </div>
+
+  <div class="side-label left-label">Federico Pian</div>
+  <div class="side-label right-label">Creative Developer</div>
+
+  <!-- Design Style — Image Preview (circular) -->
+  <div class="image-preview" id="imagePreview">
+    <div class="image-circle" id="imageCircle"></div>
+  </div>
+
+  <!-- SVG Progress Indicator -->
+  <div class="progress-circle-wrap">
+    <svg class="progress-svg" viewBox="0 0 284 284"><circle class="progress-bg" cx="142" cy="142" r="140"/><circle class="progress-fg" id="progressFg" cx="142" cy="142" r="140" stroke-dasharray="880" stroke-dashoffset="770"/></svg>
+    <div class="progress-num" id="progressNum">1<span>%</span></div>
+  </div>
+
+  <!-- Project Cards Track -->
+  <div class="project-track" id="projectTrack"></div>
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   PROJECT DATA — 8 projects from original site
+   ═══════════════════════════════════════════════════════════════ */
+const ASSETS = 'assets/images/';
+const projects = [
+  { first:'airbag', second:'studio', slug:'airbag-studio', agency:'Overpx', year:'2023',
+    award:'FWA of the day', link:'https://www.airbagstudio.it/en',
+    color1:'255, 150, 85', color2:'185, 60, 100', bgColor:'223, 151, 173',
+    image:ASSETS+'01-project-airbag.jpg', desc:'Studio focusing on designing and developing advanced and intuitive mobile ecosystems.' },
+  { first:'darko', second:'bratina', slug:'darko-bratina', agency:'Overpx', year:'2020',
+    award:'FWA of the day', link:'https://darkobratina.net/en',
+    color1:'155, 155, 155', color2:'36, 52, 78', bgColor:'137, 145, 159',
+    image:ASSETS+'02-project-darko-2.jpg', desc:'Darko Bratina as Sociologist, Cinephile and Politician. A journey discovering his life.' },
+  { first:'things', second:'agency', slug:'things-agency', agency:'Things', year:'2025',
+    award:'CSSDA of the day', link:'https://things.is',
+    color1:'2, 141, 234', color2:'113, 53, 114', bgColor:'141, 204, 246',
+    image:ASSETS+'03-project-things.jpg', desc:'European design & innovation agency pioneering in IoT experience for humans.' },
+  { first:'unisve', second:'crafts', slug:'unisve-crafts', agency:'Overpx', year:'2021',
+    award:'CSSDA of the day', link:'https://unisve.it/en',
+    color1:'236, 183, 150', color2:'0, 50, 71', bgColor:'244, 215, 197',
+    image:ASSETS+'04-project-unisve-2.jpg', desc:'Founded in 2001 to support and keep alive many traditional Venetian artisan techniques.' },
+  { first:'musical', second:'hugs', slug:'musical-hugs', agency:'AQuest', year:'2021',
+    award:'CSSDA of the day', link:'https://abbraccimusicali2021.overpx.com/',
+    color1:'208, 180, 72', color2:'195, 129, 113', bgColor:'237, 218, 213',
+    image:ASSETS+'05-project-abbracci-musicali-3.jpg', desc:'An interactive website supporting future mothers through their pregnancy journey.' },
+  { first:'post op', second:'recovery', slug:'postop-recovery', agency:'Things', year:'2025',
+    award:'N/A', link:'https://postop.ai/',
+    color1:'185, 165, 170', color2:'254, 175, 200', bgColor:'193, 204, 250',
+    image:ASSETS+'08-project-postop.jpg', desc:'Redefining surgical care with AI-empowered insights, enhancing patient recovery and clinical communication.' },
+  { first:'cme', second:'stem', slug:'cme-stem', agency:'Overpx', year:'2022',
+    award:'N/A', link:'https://cme-stem.org',
+    color1:'130, 210, 160', color2:'24, 24, 67', bgColor:'112, 117, 143',
+    image:ASSETS+'06-project-cme.jpg', desc:'Improving lives and increasing happiness through diverse STEM talent leadership.' },
+  { first:'raccagni', second:'group', slug:'raccagni-group', agency:'AQuest', year:'2020',
+    award:'N/A', link:'https://raccagni.overpx.com/en',
+    color1:'17, 17, 17', color2:'0, 0, 0', bgColor:'6, 6, 6',
+    image:ASSETS+'07-project-raccagni.jpg', desc:"Since 30 years Raccagni creates and produce zippers. It's one of the priviledge partners of the fashion world." }
+];
+
+const total = projects.length;
+const DASH = 880;
+let index = 0;
+
+/* ═══════════════════════════════════════════════════════════════
+   DIMENSION 3: FLOWING LIGHT BACKGROUND (Canvas 2D metaballs)
+   visual_effects.canvas_drawings + visual_effects.background_effects
+   ═══════════════════════════════════════════════════════════════ */
+(function() {
+  var canvas = document.getElementById('flowCanvas');
+  var ctx = canvas.getContext('2d');
+  var W, H;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  // Five large metaball orbs — colors from DNA visual_effects.background_effects.params.color_palette
+  var orbs = [
+    { x: 0.65, y: 0.15, r: 0.35, vx: 0.00008, vy: 0.00012, color: [255, 150, 85] },
+    { x: 0.25, y: 0.75, r: 0.30, vx: 0.00010, vy:-0.00006, color: [185, 60, 100] },
+    { x: 0.55, y: 0.50, r: 0.28, vx:-0.00006, vy: 0.00009, color: [223, 151, 173] },
+    { x: 0.80, y: 0.70, r: 0.22, vx:-0.00009, vy:-0.00007, color: [200, 180, 140] },
+    { x: 0.15, y: 0.30, r: 0.25, vx: 0.00007, vy:-0.00010, color: [150, 180, 210] },
+  ];
+
+  // Target colors for project switching (lerp toward these)
+  var targetColors = [
+    [255, 150, 85], [185, 60, 100], [223, 151, 173], [200, 180, 140], [150, 180, 210]
+  ];
+
+  function setTargetColors(c1, c2, bg) {
+    var a1 = c1.split(',').map(Number);
+    var a2 = c2.split(',').map(Number);
+    var a3 = bg.split(',').map(Number);
+    targetColors = [
+      a1, a2, [a3[0]*0.85, a3[1]*0.65, a3[2]*0.78],
+      [a3[0]*0.80, a3[1]*0.75, a3[2]*0.60],
+      [a3[0]*0.60, a3[1]*0.72, a3[2]*0.84]
+    ];
+  }
+  window._setFlowColors = setTargetColors;
+
+  function lerpColor(cur, tgt, amt) {
+    return [
+      cur[0] + (tgt[0] - cur[0]) * amt,
+      cur[1] + (tgt[1] - cur[1]) * amt,
+      cur[2] + (tgt[2] - cur[2]) * amt
+    ];
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Drift orbs
+    for (var i = 0; i < orbs.length; i++) {
+      var o = orbs[i];
+      o.x += o.vx;
+      o.y += o.vy;
+      if (o.x < -0.2) o.x = 1.2; if (o.x > 1.2) o.x = -0.2;
+      if (o.y < -0.2) o.y = 1.2; if (o.y > 1.2) o.y = -0.2;
+
+      // Lerp color toward target
+      o.color = lerpColor(o.color, targetColors[i], 0.008);
+
+      // Draw large soft radial gradient
+      var cx = o.x * W, cy = o.y * H;
+      var maxR = Math.max(W, H) * o.r;
+      var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR);
+
+      var c = o.color;
+      var isDark = document.documentElement.classList.contains('dark');
+
+      if (isDark) {
+        // Dark mode — softer, more transparent
+        grad.addColorStop(0, 'rgba('+c[0]+','+c[1]+','+c[2]+', 0.06)');
+        grad.addColorStop(0.5, 'rgba('+c[0]+','+c[1]+','+c[2]+', 0.03)');
+        grad.addColorStop(1, 'rgba('+c[0]+','+c[1]+','+c[2]+', 0)');
+      } else {
+        grad.addColorStop(0, 'rgba('+c[0]+','+c[1]+','+c[2]+', 0.12)');
+        grad.addColorStop(0.4, 'rgba('+c[0]+','+c[1]+','+c[2]+', 0.06)');
+        grad.addColorStop(0.7, 'rgba('+c[0]+','+c[1]+','+c[2]+', 0.02)');
+        grad.addColorStop(1, 'rgba('+c[0]+','+c[1]+','+c[2]+', 0)');
+      }
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  draw();
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   DIMENSION 3: MOUSE IMAGE TRAIL
+   visual_effects.cursor_effects — dense ribbon with knife-cut reveal
+   ═══════════════════════════════════════════════════════════════ */
+(function() {
+  var trail = document.getElementById('mouseTrail');
+  var MAX = 12, SPACING = 58, IDLE_MS = 220, MIN_SPD = 0.15;
+  var IMG_PATH = ASSETS;
+
+  var pool = [];
+  for (var i = 0; i < MAX; i++) {
+    var div = document.createElement('div');
+    div.className = 'trail-img';
+    div.style.opacity = '0';
+    div.style.transform = 'scale(0)';
+    div.innerHTML = '<img src="" alt="">';
+    trail.appendChild(div);
+    pool.push({ el: div, opacity: 0, age: 0, idx: -1, cl: -999, ct: -999, angle: 0 });
+  }
+
+  var history = [];
+  var mx = -999, my = -999, px = -999, py = -999;
+  var onScreen = false, paused = false;
+  var lsx = -999, lsy = -999, dist = 0;
+  var lastMove = 0, lastSample = 0, speed = 0;
+  var imgIdx = 0;
+  var trailImgs = [
+    '01-project-airbag.jpg','02-project-darko-2.jpg','03-project-things.jpg',
+    '04-project-unisve-2.jpg','05-project-abbracci-musicali-3.jpg',
+    '08-project-postop.jpg','06-project-cme.jpg','07-project-raccagni.jpg'
+  ];
+
+  document.addEventListener('mousemove', function(e) {
+    var now = performance.now();
+    var nx = e.clientX, ny = e.clientY;
+    if (mx >= 0) {
+      var dx = nx - mx, dy = ny - my;
+      var dt = now - lastSample;
+      if (dt > 0) {
+        var instant = Math.sqrt(dx*dx+dy*dy)/dt;
+        var alpha = instant > speed ? 0.55 : 0.25;
+        speed += (instant-speed)*alpha;
+      }
+    }
+    lastSample = now; px = mx; py = my; mx = nx; my = ny;
+    onScreen = true; lastMove = now;
+    if (speed < MIN_SPD) { lsx = mx; lsy = my; dist = 0; return; }
+    if (lsx < 0) { lsx = mx; lsy = my; }
+    var dx2 = mx - lsx, dy2 = my - lsy;
+    dist += Math.sqrt(dx2*dx2+dy2*dy2);
+    lsx = mx; lsy = my;
+    while (dist >= SPACING) {
+      dist -= SPACING;
+      var angle = Math.atan2(my - py, mx - px);
+      var img = trailImgs[imgIdx];
+      imgIdx = (imgIdx+1) % trailImgs.length;
+      history.unshift({ x: mx, y: my, a: angle, img: img });
+      if (history.length > MAX) history.pop();
+    }
+  });
+
+  document.addEventListener('mouseleave', function() { onScreen = false; });
+  document.addEventListener('mouseenter', function(e) {
+    mx = e.clientX; my = e.clientY; px = mx; py = my;
+    onScreen = true; lastMove = performance.now();
+    lsx = mx; lsy = my; dist = 0;
+  });
+
+  document.querySelectorAll('.project-card,.nav-arrow,.project-cta,.image-preview,.logo,.nav-item,.theme-toggle,.project-title-area')
+    .forEach(function(el) {
+      el.addEventListener('mouseenter', function() { paused = true; });
+      el.addEventListener('mouseleave', function() { paused = false; });
+    });
+
+  // Collect interactive elements for proximity detection
+  var interactiveEls = document.querySelectorAll(
+    '.project-card,.nav-arrow,.project-cta,.image-preview,.logo,.nav-item,.theme-toggle,header,#projectTrack,.project-title-area'
+  );
+  var PROXIMITY = 100; // px margin — trail fades when mouse is within this distance
+
+  function nearInteractive(cx, cy) {
+    for (var i = 0; i < interactiveEls.length; i++) {
+      var r = interactiveEls[i].getBoundingClientRect();
+      if (cx > r.left - PROXIMITY && cx < r.right + PROXIMITY &&
+          cy > r.top - PROXIMITY && cy < r.bottom + PROXIMITY) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function update() {
+    var now = performance.now();
+    var idle = now - lastMove > IDLE_MS;
+    var fading = !onScreen || paused || idle || (onScreen && nearInteractive(mx, my));
+
+    // Fade out faster when paused or idle
+    var fadeSpeed = fading ? 0.30 : 0.07;       // pool slot fade per frame
+    var opFadeSpeed = fading ? 0.50 : 0.22;     // active opacity blend per frame
+
+    if (fading) {
+      // Aggressively shrink history when paused
+      if (history.length > 0) {
+        history.pop();
+        if (history.length > 0) history.pop();  // double-pop for fast clear
+      }
+    }
+
+    var n = history.length;
+
+    for (var i = 0; i < MAX; i++) {
+      var p = pool[i];
+      if (i < n) {
+        var h = history[i];
+        var isNew = p.idx !== i;
+        if (isNew) { p.idx = i; p.age = 0; p.angle = h.a; }
+        var tl = h.x - 128, tt = h.y - 74;
+        var lerp = 0.42 + i*0.006; if (lerp > 1) lerp = 1;
+        var nl = p.cl + (tl - p.cl)*lerp;
+        var nt = p.ct + (tt - p.ct)*lerp;
+        if (Math.abs(tl-p.cl) > 180 || Math.abs(tt-p.ct) > 180) { nl = tl; nt = tt; }
+        p.cl = nl; p.ct = nt;
+        p.el.style.left = nl+'px';
+        p.el.style.top  = nt+'px';
+        p.el.querySelector('img').src = IMG_PATH + h.img;
+
+        var frac = 1 - i/Math.max(n,1);
+        var targetOp = frac*frac;
+        p.opacity += (targetOp - p.opacity) * opFadeSpeed;
+
+        p.age++;
+        var t = Math.min(1, p.age/24);
+        var eased = 1 - Math.pow(1-t, 3);
+        p.el.style.transform = 'scale('+eased.toFixed(4)+')';
+
+        var sf = Math.min(1, t*1.5);
+        var se = 1 - Math.pow(1-sf, 2);
+        var sx = Math.cos(p.angle)*(1-se)*60;
+        var sy = Math.sin(p.angle)*(1-se)*60;
+        p.el.querySelector('img').style.transform = 'translate('+sx.toFixed(1)+'%,'+sy.toFixed(1)+'%)';
+
+      } else {
+        p.opacity += (0-p.opacity) * fadeSpeed; p.idx = -1;
+        p.el.querySelector('img').style.transform = 'translate(0,0)';
+        if (p.opacity < 0.002) { p.opacity = 0; p.age = 0; p.cl = p.ct = -999; }
+      }
+      p.el.style.opacity = p.opacity;
+    }
+    requestAnimationFrame(update);
+  }
+  update();
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   PROJECT CARDS UI
+   ═══════════════════════════════════════════════════════════════ */
+var track = document.getElementById('projectTrack');
+var titleArea = document.getElementById('projectTitleArea');
+var projNum = document.getElementById('projectNumber');
+var projTitle = document.getElementById('projectTitle');
+var imageCircle = document.getElementById('imageCircle');
+var progressFg = document.getElementById('progressFg');
+var progressNum = document.getElementById('progressNum');
+
+function buildCards() {
+  track.innerHTML = '';
+  projects.forEach(function(p, i) {
+    var card = document.createElement('div');
+    card.className = 'project-card' + (i===0?' active':'');
+    card.innerHTML =
+      '<a href="'+p.link+'" rel="noopener" target="_blank" class="project-link" tabindex="'+(i===0?'0':'-1')+'">'+
+        '<span class="project-home-title">'+p.first+'<br>'+p.second+'</span>'+
+      '</a>'+
+      '<div class="project-meta">'+
+        '<span class="secondary"><span class="meta-label">Agency. </span>'+p.agency+'</span>'+
+        '<span class="meta-divider"></span>'+
+        '<span class="secondary"><span class="meta-label">Year. </span>'+p.year+'</span>'+
+      '</div>'+
+      '<div class="project-bottom">'+
+        '<p class="project-desc">'+p.desc+'</p>'+
+        '<a href="'+p.link+'" rel="noopener" target="_blank" class="project-cta" tabindex="'+(i===0?'0':'-1')+'">'+
+          '<span class="cta-label">Visit</span>'+
+          '<span class="cta-icon-wrap">'+
+            '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>'+
+          '</span>'+
+        '</a>'+
+      '</div>';
+    track.appendChild(card);
+  });
+}
+
+var switchTimer;
+function goTo(i) {
+  if (i === index || switchTimer) return;
+  var showcase = document.getElementById('showcase');
+
+  // Phase 1: fade out
+  showcase.classList.add('switching');
+
+  switchTimer = setTimeout(function() {
+    var cards = track.querySelectorAll('.project-card');
+    var links = track.querySelectorAll('.project-link');
+    var ctas  = track.querySelectorAll('.project-cta');
+    cards[index].classList.remove('active');
+    links[index].setAttribute('tabindex','-1');
+    ctas[index].setAttribute('tabindex','-1');
+    index = i;
+    cards[index].classList.add('active');
+    links[index].setAttribute('tabindex','0');
+    ctas[index].setAttribute('tabindex','0');
+    updateDisplay();
+
+    // Phase 2: fade in
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        showcase.classList.remove('switching');
+        switchTimer = null;
+      });
+    });
+  }, 220);
+}
+
+function updateDisplay() {
+  var p = projects[index];
+  projNum.textContent = '0'+(index+1);
+  projTitle.innerHTML = '<span class="word">'+p.first+'</span><span class="word">'+p.second+'</span>';
+  imageCircle.style.backgroundImage = 'url('+p.image+')';
+  imageCircle.style.backgroundColor = 'rgba('+p.color2+', 1)';
+  progressFg.style.strokeDashoffset = DASH - (DASH*(index+1))/total;
+  progressNum.innerHTML = (index+1)+'<span>%</span>';
+  if (window._setFlowColors) window._setFlowColors(p.color1, p.color2, p.bgColor);
+}
+
+function prev() { goTo(index===0 ? total-1 : index-1); }
+function next() { goTo(index===total-1 ? 0 : index+1); }
+
+/* ═══════════════════════════════════════════════════════════════
+   EVENT HANDLERS — keyboard, touch, wheel
+   ═══════════════════════════════════════════════════════════════ */
+document.getElementById('navPrev').addEventListener('click', prev);
+document.getElementById('navNext').addEventListener('click', next);
+document.addEventListener('keydown', function(e) {
+  if (e.key==='ArrowLeft') { e.preventDefault(); prev(); }
+  if (e.key==='ArrowRight'){ e.preventDefault(); next(); }
+});
+
+var tx = 0, ty = 0;
+document.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, {passive: true});
+document.addEventListener('touchend', function(e) {
+  var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) dx < 0 ? next() : prev();
+});
+
+var wto;
+document.addEventListener('wheel', function(e) {
+  if (wto) return;
+  wto = setTimeout(function() { wto = null; }, 600);
+  // Horizontal scroll (trackpad)
+  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+    Math.abs(e.deltaX) > 30 && (e.deltaX > 0 ? next() : prev());
+  } else {
+    // Vertical scroll — down = next, up = prev
+    Math.abs(e.deltaY) > 40 && (e.deltaY > 0 ? next() : prev());
+  }
+}, {passive: true});
+
+/* ═══════════════════════════════════════════════════════════════
+   3D PARALLAX — title area mouse tracking
+   ═══════════════════════════════════════════════════════════════ */
+(function() {
+  var titleArea = document.getElementById('projectTitleArea');
+  if (!titleArea) return;
+
+  titleArea.addEventListener('mousemove', function(e) {
+    var rect = titleArea.getBoundingClientRect();
+    var x = (e.clientX - rect.left) / rect.width;   // 0..1
+    var y = (e.clientY - rect.top) / rect.height;     // 0..1
+    // Map to -1..1
+    var mx = (x - 0.5) * 2;
+    var my = (y - 0.5) * 2;
+    titleArea.style.setProperty('--mx', mx.toFixed(3));
+    titleArea.style.setProperty('--my', my.toFixed(3));
+  });
+
+  titleArea.addEventListener('mouseleave', function() {
+    titleArea.style.setProperty('--mx', '0');
+    titleArea.style.setProperty('--my', '0');
+  });
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   THEME TOGGLE — design_system.color dark mode
+   ═══════════════════════════════════════════════════════════════ */
+var isDark = false;
+function setTheme(dark) {
+  isDark = dark;
+  document.documentElement.classList.toggle('dark', dark);
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
+}
+document.getElementById('themeToggle').addEventListener('click', function() {
+  setTheme(!isDark);
+  // Update dark mode canvas state — handled by draw loop checking .dark class
+  var btn = document.getElementById('themeToggle');
+  btn.querySelector('.theme-label').textContent = isDark ? 'Light' : 'Dark';
+});
+
+var saved = localStorage.getItem('theme');
+if (saved === 'dark') setTheme(true);
+else if (saved === 'light') setTheme(false);
+else setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+/* ═══════════════════════════════════════════════════════════════
+   LOADER — preload images + fonts → circular progress → exit
+   ═══════════════════════════════════════════════════════════════ */
+(function() {
+  var overlay   = document.getElementById('loaderOverlay');
+  var loaderFg  = document.getElementById('loaderFg');
+  var loaderNum = document.getElementById('loaderNum');
+  var DASH = 880;
+
+  // ── Resources to preload ──────────────────────────────────
+  var imgPaths = projects.map(function(p) { return p.image; });
+  // Add noise texture
+  imgPaths.push('assets/background-noise.png');
+
+  var total = imgPaths.length;
+  var loaded = 0;
+
+  function setProgress(pct) {
+    var clamped = Math.min(100, Math.max(0, Math.round(pct)));
+    var offset = DASH - (DASH * clamped) / 100;
+    loaderFg.style.strokeDashoffset = offset;
+    loaderNum.innerHTML = clamped + '<span>%</span>';
+  }
+
+  function oneLoaded() {
+    loaded++;
+    setProgress((loaded / total) * 100);
+    if (loaded >= total) { finish(); }
+  }
+
+  function finish() {
+    // Small pause at 100% so the user sees completion
+    setTimeout(function() {
+      // Phase 1 — loader ring scales up slightly and fades
+      overlay.classList.add('exiting');
+
+      // Phase 2 — reveal main page after overlay starts fading
+      setTimeout(function() {
+        buildCards();
+        updateDisplay();
+        requestAnimationFrame(function() {
+          document.documentElement.style.setProperty('--opacity', '1');
+        });
+      }, 400);
+    }, 350);
+  }
+
+  // ── Preload images ────────────────────────────────────────
+  imgPaths.forEach(function(src) {
+    var img = new Image();
+    img.onload  = oneLoaded;
+    img.onerror = oneLoaded; // count errors too so it doesn't stall
+    img.src = src;
+  });
+
+  // ── Fallback: safety timeout in case something hangs ──────
+  setTimeout(function() {
+    if (loaded < total) {
+      loaded = total;
+      setProgress(100);
+      finish();
+    }
+  }, 8000);
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════════════════ */
+// buildCards() + updateDisplay() are now called from the loader
+// finish callback — do NOT call them here.
+</script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "name": "Federico Pian Portfolio",
+    "description": "Creative developer portfolio showcasing projects with flowing light background, mouse image trail, and brutalist-inspired typography",
+    "source_references": ["https://www.federicopian.com/"],
+    "created_at": "2026-06-28"
+  },
+  "design_system": {
+    "color": {
+      "palette_type": "adaptive-per-project",
+      "primary": { "hex": "#17191A", "role": "text, borders, icons" },
+      "secondary": { "hex": "#505050", "role": "meta text, labels" },
+      "accent": { "hex": "varies-per-project", "role": "project-specific accent colors" },
+      "neutral": { "scale": ["#FFFFFF", "#F5F5F5", "#E5E5E5", "#505050", "#17191A"], "usage": "light bg → dark text gradient" },
+      "semantic": { "success": null, "warning": null, "error": null, "info": null },
+      "surface": { "background": "#F0EFEA", "card": "transparent", "elevated": "transparent" },
+      "contrast_strategy": "high contrast text on light surface, inverted on dark mode"
+    },
+    "typography": {
+      "type_scale": {
+        "display": { "size": "min(13.5vw, 22.4rem)", "weight": "400", "line_height": "0.85", "tracking": "-0.06em" },
+        "heading_1": { "size": "12.8rem", "weight": "400", "line_height": "0.85", "tracking": "-0.05em" },
+        "heading_2": { "size": "3.2rem", "weight": "400", "line_height": "1.1", "tracking": "-0.04em" },
+        "heading_3": { "size": "2.0rem", "weight": "400", "line_height": "1.2", "tracking": "-0.05em" },
+        "body": { "size": "1.6rem", "weight": "400", "line_height": "1.2", "tracking": "-0.05em" },
+        "body_small": { "size": "1.2rem", "weight": "400", "line_height": "1.0", "tracking": "-0.05em" },
+        "caption": { "size": "1.1rem", "weight": "400", "line_height": "1.0", "tracking": "-0.02em" },
+        "overline": { "size": "1.4rem", "weight": "400", "line_height": "1.0", "tracking": "0" }
+      },
+      "font_families": { "heading": "Safiro, sans-serif", "body": "Safiro, sans-serif", "mono": "monospace" },
+      "font_style_notes": "Custom Safiro font — geometric sans-serif with clean terminals. All weights at 400 (regular). Fluid sizing using min()/vw."
+    },
+    "spacing": {
+      "base_unit": "1rem",
+      "scale": ["0.5rem", "1rem", "2rem", "4rem", "8rem"],
+      "content_density": "spacious",
+      "section_rhythm": "generous vertical spacing, 4rem+ section gaps, tight internal card spacing"
+    },
+    "layout": {
+      "grid_system": "12-column CSS grid for header, flexbox for content",
+      "max_content_width": "100vw",
+      "columns": 12,
+      "gutter": "2rem",
+      "breakpoints": ["mobile: 0px", "tablet: 768px", "desktop: 1024px"],
+      "alignment_tendency": "asymmetric — left-heavy for labels, centered for headings, justified for body"
+    },
+    "shape": {
+      "border_radius": { "small": "7px", "medium": "1rem", "large": "1.5rem", "pill": "50%" },
+      "border_usage": "subtle 1px borders on interactive elements only",
+      "divider_style": "thin inline separators between meta items"
+    },
+    "elevation": {
+      "shadow_style": "none",
+      "levels": { "low": "none", "medium": "none", "high": "none" },
+      "depth_cues": "z-index layering, color transitions, no shadows"
+    },
+    "iconography": {
+      "style": "minimal stroke icons",
+      "stroke_weight": "1-1.5px",
+      "size_scale": "1.8rem — 3rem",
+      "preferred_set": "custom inline SVG"
+    },
+    "motion": {
+      "easing": "cubic-bezier(.215, .61, .355, 1)",
+      "duration_scale": { "micro": "0.2s", "normal": "0.4s", "macro": "0.6s" },
+      "entrance_pattern": "fade + slight translateY on card reveal",
+      "exit_pattern": "fade out",
+      "philosophy": "smooth glide — snappy but polished, GSAP-powered transitions"
+    },
+    "components": {
+      "button_style": "outlined pill buttons with expand-on-hover icon, animated label swap",
+      "input_style": "none observed",
+      "card_style": "transparent, borderless, content-driven layout",
+      "navigation_pattern": "side arrow buttons with duplicate-icon hover slide, keyboard/touch/wheel support",
+      "modal_style": "none",
+      "list_style": "5-column horizontal project list with alternating top/bottom positions",
+      "component_notes": "Progress circle with SVG stroke-dasharray. CTA buttons with label slide-up + icon crossfade. Nav arrows with duplicate SVG slide on hover."
+    }
+  },
+  "design_style": {
+    "aesthetic": {
+      "mood": ["editorial", "brutalist-restrained", "kinetic", "precise"],
+      "visual_metaphor": "laboratory notebook — clean, systematic, content-first",
+      "era_influence": "contemporary brutalist minimalism",
+      "genre": "creative developer portfolio — brutalist editorial",
+      "personality_traits": ["confident", "meticulous", "restrained", "experimental"],
+      "adjectives": ["clean", "kinetic", "editorial", "brutalist", "fluid"]
+    },
+    "visual_language": {
+      "complexity": "minimal",
+      "ornamentation": "subtle accents — flowing light bg, cursor trail",
+      "whitespace_usage": "generous breathing room, content anchors to edges",
+      "visual_weight_distribution": "top-heavy headings, bottom-anchored meta, wide-open center",
+      "focal_strategy": "progressive reveal — project title dominates, details follow",
+      "contrast_level": "high — dark text on light surface, stark typographic hierarchy",
+      "texture_usage": "noise overlay in dark mode only"
+    },
+    "composition": {
+      "hierarchy_method": "scale contrast — massive project titles vs small meta labels",
+      "balance_type": "asymmetric with anchoring grid",
+      "flow_direction": "horizontal — projects slide left/right, labels frame sides",
+      "grouping_strategy": "spatial — related metadata grouped with dividers, CTA separated by space",
+      "negative_space_role": "active framing — empty space directs focus to active content"
+    },
+    "imagery": {
+      "photo_treatment": "full-color, circle-cropped preview, rectangular in trail",
+      "illustration_style": "none",
+      "graphic_elements": "flowing metaball light background, circular progress indicator",
+      "pattern_usage": "noise texture in dark mode overlay",
+      "image_shape": "circular preview (pill), rectangular trail cards (7px radius)"
+    },
+    "interaction_feel": {
+      "feedback_style": "immediate visual response — color shifts, scale changes",
+      "hover_behavior": "expand/slide animations on buttons, scale on preview image",
+      "transition_personality": "smooth glide with cubic-bezier(.215,.61,.355,1)",
+      "loading_style": "opacity 0→1 transition after initial render",
+      "microinteraction_density": "high — hover states on all interactive elements, flowing bg, cursor trail"
+    },
+    "brand_voice_in_ui": {
+      "tone": "direct, confident, minimal",
+      "formality": "professional but personal",
+      "cta_style": "direct imperative — single word 'Visit'",
+      "empty_state_approach": "n/a — all content preloaded",
+      "error_tone": "n/a"
+    }
+  },
+  "visual_effects": {
+    "overview": {
+      "effect_intensity": "moderate",
+      "performance_tier": "medium",
+      "fallback_strategy": "static background color, hide trail, disable canvas on low-end",
+      "primary_technology": "Canvas 2D + vanilla JS"
+    },
+    "background_effects": {
+      "type": "metaball-gradient",
+      "description": "Large flowing radial gradients (metaballs) drifting across canvas, colors lerp per-project",
+      "technology": "Canvas 2D",
+      "params": {
+        "color_palette": ["#FF9655", "#B93C64", "#DF97AD", "#C8B48C", "#96B4D2"],
+        "speed": "very slow drift (0.00006–0.00012 velocity)",
+        "density": "5 large orbs covering viewport",
+        "opacity": "0.02–0.12 per orb",
+        "blend_mode": "lighter (additive blending)"
+      }
+    },
+    "particle_systems": { "enabled": false },
+    "3d_elements": {
+      "enabled": false,
+      "type": "none",
+      "description": "Original site uses Three.js for background, replaced with Canvas 2D for standalone compatibility"
+    },
+    "shader_effects": { "enabled": false },
+    "scroll_effects": {
+      "parallax": { "enabled": false },
+      "scroll_triggered_animations": { "enabled": false },
+      "scroll_morphing": { "enabled": false }
+    },
+    "text_effects": { "type": "none", "description": "Pure typographic impact — no text animation effects" },
+    "cursor_effects": {
+      "enabled": true,
+      "type": "image-trail",
+      "description": "Dense ribbon of project images follows cursor with knife-cut slide-reveal + scale-in animation. Images placed every 58px along path, 12-image pool, cubic ease-out scale 0→1 over 24 frames, image slides in from opposite direction of movement.",
+      "params": {
+        "shape": "rounded-rect-256x147",
+        "size": "25.6rem × aspect-ratio(1.74)",
+        "blend_mode": "normal",
+        "trail": "dense ribbon, 58px spacing, 12 images, velocity-gated (>0.15px/ms)",
+        "interaction_zone": "viewport excluding interactive elements"
+      }
+    },
+    "image_effects": {
+      "type": "scale-hover",
+      "description": "Circular preview image scales to 1.1 on hover with 1s ease transition",
+      "params": { "hover_transform": "scale(1.1)", "reveal_animation": "slide-from-movement-direction", "distortion_type": "none" }
+    },
+    "glassmorphism_neumorphism": { "enabled": false },
+    "canvas_drawings": {
+      "enabled": true,
+      "type": "metaballs",
+      "description": "Five large radial gradient orbs drift across full-viewport canvas, lerping colors and positions. Colors transition when project changes.",
+      "technology": "Canvas 2D",
+      "params": {
+        "draw_method": "createRadialGradient per orb",
+        "animation_loop": "requestAnimationFrame",
+        "color_scheme": "project-specific warm gradients",
+        "responsiveness": "full viewport, resize with debounce",
+        "interaction": "none — ambient only"
+      }
+    },
+    "svg_animations": {
+      "enabled": true,
+      "type": "stroke-dasharray",
+      "description": "Circular progress indicator animates stroke-dashoffset when switching projects",
+      "params": {
+        "animation_method": "stroke-dashoffset transition",
+        "path_morphing": false,
+        "stroke_animation": true,
+        "filter_effects": false
+      }
+    },
+    "composite_notes": "Three effect layers stack: (1) Canvas metaball background at lowest z-index, (2) dark mode noise texture overlay via CSS animation, (3) mouse image trail at z-index 100. Canvas and trail use separate requestAnimationFrame loops. Dark mode applies CSS filter inversion to background. Original site uses Three.js/TresJS with custom GLSL shaders for background — simplified to Canvas 2D metaballs in standalone version."
+  }
+}
